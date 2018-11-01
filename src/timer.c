@@ -108,6 +108,6 @@ unsigned long delta_time(unsigned long t0)
 void sleep(unsigned long t)
 {
     unsigned long target = t + timer_ms;
-    while( timer_ms != target );
+    while( timer_ms > target );
 }
 
