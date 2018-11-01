@@ -211,15 +211,15 @@ __sbit __at ( 0xF8 ) SPR0     ;
 #define INTNUM_TO_UVEC(d) (0x2000 | ((d) * 8) + 3)
 
 /* Interrupt vector addresses */
-#define IE0_USER_VECTOR         INTNUM_TO_UVEC(IE0_VECTOR)
-#define TF0_USER_VECTOR         INTNUM_TO_UVEC(TF0_VECTOR)
-#define IE1_USER_VECTOR         INTNUM_TO_UVEC(IE1_VECTOR)
-#define TF1_USER_VECTOR         INTNUM_TO_UVEC(TF1_VECTOR)
-#define RI_TI_USER_VECTOR       INTNUM_TO_UVEC(SIO_VECTOR)
-#define TF2_EXF2_USER_VECTOR    INTNUM_TO_UVEC(TF2_VECTOR)
-#define ADCI_USER_VECTOR        INTNUM_TO_UVEC(ADC_VECTOR)
-#define I2CI_ISPI_USER_VECTOR   INTNUM_TO_UVEC(I2C_SPI_VECTOR)
-#define PSMI_USER_VECTOR        INTNUM_TO_UVEC(PSM_VECTOR)
+#define IE0_USER_VECTOR         ((XDATA(unsigned char) *) INTNUM_TO_UVEC(IE0_VECTOR))
+#define TF0_USER_VECTOR         ((XDATA(unsigned char) *) INTNUM_TO_UVEC(TF0_VECTOR))
+#define IE1_USER_VECTOR         ((XDATA(unsigned char) *) INTNUM_TO_UVEC(IE1_VECTOR))
+#define TF1_USER_VECTOR         ((XDATA(unsigned char) *) INTNUM_TO_UVEC(TF1_VECTOR))
+#define RI_TI_USER_VECTOR       ((XDATA(unsigned char) *) INTNUM_TO_UVEC(SIO_VECTOR))
+#define TF2_EXF2_USER_VECTOR    ((XDATA(unsigned char) *) INTNUM_TO_UVEC(TF2_VECTOR))
+#define ADCI_USER_VECTOR        ((XDATA(unsigned char) *) INTNUM_TO_UVEC(ADC_VECTOR))
+#define I2CI_ISPI_USER_VECTOR   ((XDATA(unsigned char) *) INTNUM_TO_UVEC(I2C_SPI_VECTOR))
+#define PSMI_USER_VECTOR        ((XDATA(unsigned char) *) INTNUM_TO_UVEC(PSM_VECTOR))
 
 // TMOD Bits
 #define TMOD_T1_GC 0x80						// Gate Control: Timer_enabled = ~INT1 && TR1 if set to 1, = TR1 if cleared
@@ -249,5 +249,17 @@ __sbit __at ( 0xF8 ) SPR0     ;
 #define TCON_IE0_FLAG 0x02
 #define TCON_IE0_TYPE_FRONT 0x01
 #define TCON_IE0_TYPE_LEVEL 0x00
+
+#define T2CON_T2_OVERFLOW 0x80
+#define T2CON_T2_EXT_FLAG 0x40
+#define T2CON_T2_REC_CLK  0x20
+#define T2CON_T2_TNS_CLK  0x10
+#define T2CON_T2_EXT_ENA  0x08
+#define T2CON_T2_ENABLE   0x04
+#define T2CON_T2_COUNTER  0x02
+#define T2CON_T2_TIMER    0x00
+#define T2CON_T2_CAP_SEL  0x01
+
+
 #endif //__ADUC812_H
 

@@ -1,4 +1,34 @@
+#include "max.h"
+#include "common.h"
 #include "interrupt.h"
+
+void int0_handler() interrupt(IE0_VECTOR);
+
+// Enable INT0 at ENA register to enable Ext. Interrupt 0
+void ena_int0(){
+#define ENA_ADDRESS ((XDATA(unsigned char)*) 4)
+#define ENA_INT0_MASK 0x20
+    write_max(ENA_ADDRESS, ENA_INT0_MASK | read_max(ENA_ADDRESS));
+}
+
+void init_interrupts(){
+    
+    IE = 0; // Clear Interrupt Registers
+    IE2 = 0;
+    IP = 0; // Interrupt Priority
+
+    // Mode switcher
+    ena_int0();
+    set_vector(IE0_USER_VECTOR, (void*) int0_handler);   
+    EX0 = 1; // Enable External Interrupt 0
+    EA = 1; // Enable interrupts
+}
+
+void int0_handler() interrupt(IE0_VECTOR)
+{
+    led_mode ^= 1;
+    // if( led_mode == LED_MODE_STATIC ) 
+}
 
 void set_vector(XDATA(unsigned char) *address, void* vector)
 {

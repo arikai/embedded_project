@@ -17,9 +17,9 @@ LFLAGS  = --code-loc 0x2100 --xram-loc 0x6000 --stack-auto --stack-loc 0x80
 # Настройки M3P
 
 M3P		 = m3p
-COMPORT	 = /dev/ttyUSB0 # Порты с номером >9 должны писаться как \\.\COM10
+COMPORT	 = /dev/ttyUSB0
 # COMPORT	 = COM4 # Порты с номером >9 должны писаться как \\.\COM10
-COMLOG	 = $(COMPORT)_log.txt
+COMLOG   = comport_log.txt
 BAUD	 = 9600	
 
 # Правила компиляции и загрузки
@@ -28,7 +28,7 @@ NAME = prog
 TARGET = $(NAME).bin
 SRCDIR = src
 
-SRCS = $(wildcard ./src/*.c)
+SRCS = $(wildcard ./$(SRCDIR)/*.c)
 
 LIST_OBJ = $(SRCS:.c=.rel)
 
@@ -58,13 +58,14 @@ clean:
 
 
 load: $(TARGET) load.m3p
-	$(M3P) lfile load.m3p
+	@echo > $(COMPORT) || { echo -e "Permission denied to $(COMPORT).\n Consider running chmod o+rw $(COMPORT)" && false; }
+	$(M3P) lfile load.m3p & sleep 10 && pkill m3p &
 
 # Save with cp1251 encoding for this to work
 define loadm3pprog
 terminateonerror                                                     \n\
 -- Открытие com-порта ($(COMPORT)) на скорости $(BAUD) бит/с         \n\
-$(BAUD) openchannel $(COMPORT)                                       \n\
+$(BAUD) openchannel $(COMPORT)                                   \n\
 : wait                                                               \n\
                                                                      \n\
     cr cr                                                            \n\
@@ -89,7 +90,7 @@ bye
 endef
 
 load.m3p: Makefile
-	echo -e " $(loadm3pprog) " >load.m3p
+	echo "$(loadm3pprog)" >load.m3p
 
 term:
 	$(M3P) echo $(COMLOG) $(BAUD) openchannel $(COMPORT) +echo 6 term -echo bye
