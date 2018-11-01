@@ -5,7 +5,7 @@
 #define TIMER_FREQ (CPU_FREQ/12) 
 
 // #define TIMER_MS (TIMER_FREQ / 1000)
-#define TIMER_MS (TIMER_FREQ / 100)
+#define TIMER_MS (TIMER_FREQ / 1000)
 #define TIMER_MS_TICK_HIGH ((TIMER_MS >> 8) & 0xff)
 #define TIMER_MS_TICK_LOW  (TIMER_MS & 0xff) 
 

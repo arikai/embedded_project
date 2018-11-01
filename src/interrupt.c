@@ -27,7 +27,6 @@ void init_interrupts(){
 void int0_handler() interrupt(IE0_VECTOR)
 {
     led_mode ^= 1;
-    // if( led_mode == LED_MODE_STATIC ) 
 }
 
 void set_vector(XDATA(unsigned char) *address, void* vector)

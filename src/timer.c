@@ -64,10 +64,11 @@ void init_system_timer(){
     timer_ms = 0;
 
     ET2 = 1; // Enable interrupt
-    PT2 = 1; // Set High Priority
+    // PT2 = 1; // Set High Priority
 
     T2CON |= T2CON_T2_ENABLE | T2CON_T2_TIMER;
 
+    // 8/5 ms
     RCAP2H = TH2 = 0xea;
     RCAP2L = TL2 = 0x66;
 }
@@ -76,7 +77,6 @@ void init_system_timer(){
 void timer_int_handler() interrupt(TF0_VECTOR)
 {
     static unsigned long time;
-    time = get_time();
 
     TH0 = TIMER_DELAY_HIGH;
     TL0 = TIMER_DELAY_LOW;
@@ -84,15 +84,9 @@ void timer_int_handler() interrupt(TF0_VECTOR)
 
 void timer2_int_handler() interrupt(TF2_VECTOR)
 {
-    static char err_count = 0;
-
-    ++err_count;
-    timer_ms += 1 + err_count&1;
-    if( err_count == 5 )
-	err_count = 0;
-    // ++timer_ms;
-    // leds_static(timer_ms/1000);
-    leds_pwm();
+    ++timer_ms;
+    if( led_mode == LED_MODE_ANIMATION ) leds_pwm();
+    else leds_static(TL1);
 }
 
 unsigned long get_time(void)
@@ -108,6 +102,6 @@ unsigned long delta_time(unsigned long t0)
 void sleep(unsigned long t)
 {
     unsigned long target = t + timer_ms;
-    while( timer_ms > target );
+    while( get_time() <= target );
 }
 

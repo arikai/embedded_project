@@ -2,9 +2,7 @@
 #include "max.h"
 #include "led.h"
 
-#define BRIGHTNESS(v) (LED_MAX_BRIGHTNESS - (v))
 struct leds_state state = { {0}, {0} };
-unsigned char led_steps[] = { 0, 237, 241, 251, 254, 255 };
 
 static unsigned char old_led = 0;   
 
@@ -39,9 +37,9 @@ void update_leds(){
                                          // leaving fading "led-tail"
 
     unsigned char i;
-    // progress leader
+
     led_leader += direction;
-    // update brightness of all LEDs
+
     for( i = 0 ; i < 8; ++i ){
 	if( i != led_leader ){
 	    DEC_BRIGHTNESS(state.brightness[i]);
@@ -50,9 +48,7 @@ void update_leds(){
 	    state.brightness[i] = LED_MAX_BRIGHTNESS;
     }
 
-    // update brightness of leader
     if( !led_leader || led_leader == 7 )
         direction = -direction;
-    
 }
 
