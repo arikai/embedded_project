@@ -1,97 +1,89 @@
-#include "common.h"
 #include "timer.h"
+#include "sound.h" // Sound Timer (Timer 0) 
 #include "aduc812.h"
 #include "interrupt.h"
 
-#include "led.h" // TODO: remove temporary
+#include "led.h"
 
-unsigned long timer_ms;
+/*
+ * ADuC's Timers Usage:
+ *   Timer 0:
+ *   Timer 1: System Time
+ *   Timer 2:
+ */
 
-static next_frame = 0;
-#define FRAME_DELAY 500 // ms
+#define TIMER_MS (TIMER_FREQ / 1000)
+#define TIMER_MS_TICK_HIGH ((TIMER_MS >> 8) & 0xff)
+#define TIMER_MS_TICK_LOW  (TIMER_MS & 0xff) 
 
-void init_timer();
-void init_counter();
-void init_system_timer();
-void timer_int_handler() interrupt(TF0_VECTOR);
-void timer2_int_handler() interrupt(TF2_VECTOR);
+#define TIMER_DELAY_HIGH ((unsigned char)(0xff - TIMER_MS_TICK_HIGH))
+#define TIMER_DELAY_LOW  ((unsigned char)(0xff - TIMER_MS_TICK_LOW))
+
+static unsigned long timer_ms;
+
+void init_sound_timer(void);
+void sound_int_handler(void) interrupt(TF0_VECTOR);
+
+void init_system_timer(void);
+void system_timer_int_handler(void) interrupt(TF1_VECTOR);
 
 void init_timers(void)
 {
-    /*
-     *                   Timer 0 (16 bit)
-     *   T1 interrupt -> increment Counter 1 (16 bit) 
-     * INT0 interrupt -> change mode of LED display
-     *		      -> Timer 2 (16 bit) - system timer
-     *
-    */
-
     TCON = 0;
     TMOD = 0;
     T2CON = 0;
 
-    init_timer();
-    init_counter();
+    init_sound_timer();
     init_system_timer();
 }
 
-// Timer 0 - 8-bit timer 
-void init_timer(){
-    set_vector(TF0_USER_VECTOR, (void*) timer_int_handler);
+/* Init Sound Timer (Timer 0) */
+void init_sound_timer(void){
+    // ET0 = 1;
 
-    ET0 = 1; // Enable Timer 0 Interrupt
+    TH0 = 0xFF;
+    TL0 = 0xFF;
 
-    TH0 = TIMER_DELAY_HIGH;
-    TL0 = TIMER_DELAY_LOW;
-    
     TMOD |= TMOD_T0_TYPE_TIMER | TMOD_T0_MODE_16BIT;
-    TCON |= TCON_T0_ENABLE | TCON_IE0_TYPE_FRONT;
+    TCON |= TCON_T0_ENABLE;
+
+    set_vector(TF0_USER_VECTOR, (void*) sound_int_handler);
 }
 
-// Timer 1 - IE1 Front counter 
-void init_counter(){
-    TH1 = 0;
-    TL1 = 0;
-
-    TMOD |= TMOD_T1_TYPE_COUNTER | TMOD_T1_MODE_16BIT;
-    TCON |= TCON_T1_ENABLE | TCON_IE1_TYPE_FRONT;
-    // TCON |= TCON_T1_ENABLE; // | TCON_IE1_TYPE_FRONT;
-}
-
-void init_system_timer(){
-    set_vector(TF2_EXF2_USER_VECTOR, (void*) timer2_int_handler);
-
-    timer_ms = 0;
-
-    ET2 = 1; // Enable interrupt
-    // PT2 = 1; // Set High Priority
-
-    T2CON |= T2CON_T2_ENABLE | T2CON_T2_TIMER;
-
-    // 8/5 ms
-    RCAP2H = TH2 = 0xea;
-    RCAP2L = TL2 = 0x66;
-}
-
-/* HANDLERS */
-void timer_int_handler() interrupt(TF0_VECTOR)
+/* Sound Timer (Timer 0) Interrupt Handler */
+void sound_int_handler(void) interrupt(TF0_VECTOR)
 {
-    static unsigned long time;
+    TL0 = note_period[0];
+    TH0 = note_period[1];
 
-    TH0 = TIMER_DELAY_HIGH;
-    TL0 = TIMER_DELAY_LOW;
+    beep();
 }
 
-void timer2_int_handler() interrupt(TF2_VECTOR)
+/* Init System Timer (Timer 1) */
+void init_system_timer(void){
+    ET1 = 1;
+
+    TH1 = TIMER_DELAY_HIGH;
+    TL1 = TIMER_DELAY_LOW;
+
+    TMOD |= TMOD_T1_TYPE_TIMER | TMOD_T1_MODE_16BIT;
+    TCON |= TCON_T1_ENABLE;
+
+    set_vector(TF1_USER_VECTOR, (void*) system_timer_int_handler);
+}
+
+/* Timer 1 Interrupt Handler */
+void system_timer_int_handler(void) interrupt(TF1_VECTOR)
 {
     ++timer_ms;
-    if( led_mode == LED_MODE_ANIMATION ) leds_pwm();
-    else leds_static(TL1);
+    TH1 = TIMER_DELAY_HIGH;
+    TL1 = TIMER_DELAY_LOW;
 }
 
 unsigned long get_time(void)
 {
-    return timer_ms;
+    unsigned long local = timer_ms; // Avoid possible interruption
+    return local;
 }
 
 unsigned long delta_time(unsigned long t0)
@@ -101,7 +93,7 @@ unsigned long delta_time(unsigned long t0)
 
 void sleep(unsigned long t)
 {
-    unsigned long target = t + timer_ms;
+    unsigned long target = t + get_time();
     while( get_time() <= target );
 }
 

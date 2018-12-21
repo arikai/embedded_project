@@ -1,13 +1,5 @@
-#ifndef __ADUC812__H
-#define __ADUC812__H
-
-// Starting from version 2.9 or so, xdata definition changed
-#if SDCC_REVISION > 8008 || __SDCC_REVISION > 8008
-	#define XDATA(type) __xdata type
-	#define interrupt __interrupt
-#else 
-	#define XDATA(type) type xdata // 
-#endif
+#ifndef __ADUC812_H__
+#define __ADUC812_H__
 
 /*  BYTE Register  */
 __sfr __at ( 0x80 )  P0       ;
@@ -197,69 +189,15 @@ __sbit __at ( 0xF8 ) SPR0     ;
 #define T1_MASK         0xF0
 
 /* Interrupt numbers: address = (number * 8) + 3 */
-#define IE0_VECTOR      0       /* 0x03 external interrupt 0 */
-#define TF0_VECTOR      1       /* 0x0b timer 0 */
-#define IE1_VECTOR      2       /* 0x13 external interrupt 1 */
-#define TF1_VECTOR      3       /* 0x1b timer 1 */
-#define SIO_VECTOR      4       /* 0x23 serial port 0 */
-#define TF2_VECTOR      5		/* 0x2b timer 2 */
-#define ADC_VECTOR      6		/* 0x33 ADC */
-#define I2C_SPI_VECTOR  7		/* 0x3b I2C/SPI interrupt */
-#define PSM_VECTOR      8		/* 0x43 Power Supply Monitor Interrupt */
+#define IE0_VECTOR      0       /* 0x03 External Interrupt 0 */
+#define TF0_VECTOR      1       /* 0x0b Timer 0 */
+#define IE1_VECTOR      2       /* 0x13 External Interrupt 1 */
+#define TF1_VECTOR      3       /* 0x1b Timer 1 */
+#define SI0_VECTOR      4       /* 0x23 Serial Port 0 */
+#define TF2_VECTOR      5       /* 0x2b Timer 2 */
+#define ADC_VECTOR      6       /* 0x33 Analog-to-Digital-Converter */
+#define I2C_SPI_VECTOR  7       /* 0x3b I2C/SPI */
+#define PSM_VECTOR      8       /* 0x43 Power Supply Monitor */
 
-// Convert interrupt number to User Vector Address
-#define INTNUM_TO_UVEC(d) (0x2000 | ((d) * 8) + 3)
-
-/* Interrupt vector addresses */
-#define IE0_USER_VECTOR         ((XDATA(unsigned char) *) INTNUM_TO_UVEC(IE0_VECTOR))
-#define TF0_USER_VECTOR         ((XDATA(unsigned char) *) INTNUM_TO_UVEC(TF0_VECTOR))
-#define IE1_USER_VECTOR         ((XDATA(unsigned char) *) INTNUM_TO_UVEC(IE1_VECTOR))
-#define TF1_USER_VECTOR         ((XDATA(unsigned char) *) INTNUM_TO_UVEC(TF1_VECTOR))
-#define RI_TI_USER_VECTOR       ((XDATA(unsigned char) *) INTNUM_TO_UVEC(SIO_VECTOR))
-#define TF2_EXF2_USER_VECTOR    ((XDATA(unsigned char) *) INTNUM_TO_UVEC(TF2_VECTOR))
-#define ADCI_USER_VECTOR        ((XDATA(unsigned char) *) INTNUM_TO_UVEC(ADC_VECTOR))
-#define I2CI_ISPI_USER_VECTOR   ((XDATA(unsigned char) *) INTNUM_TO_UVEC(I2C_SPI_VECTOR))
-#define PSMI_USER_VECTOR        ((XDATA(unsigned char) *) INTNUM_TO_UVEC(PSM_VECTOR))
-
-// TMOD Bits
-#define TMOD_T1_GC 0x80						// Gate Control: Timer_enabled = ~INT1 && TR1 if set to 1, = TR1 if cleared
-#define TMOD_T1_TYPE_COUNTER 0x40
-#define TMOD_T1_TYPE_TIMER 0x00
-#define TMOD_T1_MODE_OFF 0x30
-#define TMOD_T1_MODE_8BIT_AUTORELOAD 0x20 // TH is reloaded into TL each time TL overflows
-#define TMOD_T1_MODE_16BIT 0x10
-#define TMOD_T1_MODE_8BIT_PRESCALER 0x00 // TH - 8bit counter, 5 bits of TL - prescaler
-
-#define TMOD_T0_GC 0x08						// Gate Control: Timer_enabled = ~INT0 && TR0 if set to 1, = TR-0 if cleared
-#define TMOD_T0_TYPE_COUNTER 0x04
-#define TMOD_T0_TYPE_TIMER 0x00
-#define TMOD_T0_MODE_OFF 0x03
-#define TMOD_T0_MODE_8BIT_AUTORELOAD 0x02 // TH is reloaded into TL each time TL overflows
-#define TMOD_T0_MODE_16BIT 0x01
-#define TMOD_T0_MODE_8BIT_PRESCALER 0x00 // TH - 8bit counter, 5 bits of TL - prescaler
-
-// TCON Bits
-#define TCON_T1_OVERFLOW 0x80
-#define TCON_T1_ENABLE 0x40
-#define TCON_T0_OVERFLOW 0x20
-#define TCON_T0_ENABLE 0x10
-#define TCON_IE1_FLAG 0x08
-#define TCON_IE1_TYPE_FRONT 0x04
-#define TCON_IE1_TYPE_LEVEL 0x00
-#define TCON_IE0_FLAG 0x02
-#define TCON_IE0_TYPE_FRONT 0x01
-#define TCON_IE0_TYPE_LEVEL 0x00
-
-#define T2CON_T2_OVERFLOW 0x80
-#define T2CON_T2_EXT_FLAG 0x40
-#define T2CON_T2_REC_CLK  0x20
-#define T2CON_T2_TNS_CLK  0x10
-#define T2CON_T2_EXT_ENA  0x08
-#define T2CON_T2_ENABLE   0x04
-#define T2CON_T2_COUNTER  0x02
-#define T2CON_T2_TIMER    0x00
-#define T2CON_T2_CAP_SEL  0x01
-
-
-#endif //__ADUC812_H
+#endif /* __ADUC812_H__ */
 
