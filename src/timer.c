@@ -2,6 +2,7 @@
 #include "sound.h" // Sound Timer (Timer 0) 
 #include "aduc812.h"
 #include "interrupt.h"
+#include "keyboard.h"
 
 #include "led.h"
 
@@ -44,6 +45,8 @@ void init_sound_timer(void){
     TH0 = 0xFF;
     TL0 = 0xFF;
 
+    PT0 = 1; // High Priority for "smooth" sound
+
     TMOD |= TMOD_T0_TYPE_TIMER | TMOD_T0_MODE_16BIT;
     TCON |= TCON_T0_ENABLE;
 
@@ -78,6 +81,12 @@ void system_timer_int_handler(void) interrupt(TF1_VECTOR)
     ++timer_ms;
     TH1 = TIMER_DELAY_HIGH;
     TL1 = TIMER_DELAY_LOW;
+
+    /* Keyboard Events handler */
+    if( kb_any_key_pressed() )
+    {
+        kb_process();
+    }
 }
 
 unsigned long get_time(void)

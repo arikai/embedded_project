@@ -31,6 +31,7 @@ void init_system();
 #define ENA_SND2  0x10
 #define ENA_INT0  0x20
 #define ENA_KB    0x40
+
 uint8_t get_ena( void );
 void set_ena( uint8_t );
 void xor_ena( uint8_t );

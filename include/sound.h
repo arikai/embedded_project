@@ -20,7 +20,7 @@ extern XDATA(uint16_t) note_table[72];
 #define NOTE_A1 NOTE(0)
 #define NOTE_G7S NOTE(71)
 
-#define NOTE_BPM 240
+#define NOTE_BPM 120
 
 // in milliseconds
 #define NOTE_WHOLE      (240000 / NOTE_BPM)
