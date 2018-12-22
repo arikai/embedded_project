@@ -4,7 +4,8 @@
 #include "common.h"
 #include "system.h"
 
-extern uint8_t keys[16];
+#define KEYNUM 16
+extern uint8_t keys[KEYNUM];
 
 enum kb_event_type { KB_NONE = 0, KB_PRESS, KB_RELEASE };
 
@@ -29,7 +30,7 @@ extern struct kb_event kb_event;
  * Push new keyboard event to Event Queue
  * Must not be of KB_NONE type
  * NOTE: event's key and type passed separately
- * because SDCC sucks and doesn't support struct arguments to functions
+ * because SDCC lacks features and doesn't support struct arguments to functions
  */
 void kb_push_event(uint8_t key, enum kb_event_type);
 

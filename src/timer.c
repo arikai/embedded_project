@@ -83,10 +83,7 @@ void system_timer_int_handler(void) interrupt(TF1_VECTOR)
     TL1 = TIMER_DELAY_LOW;
 
     /* Keyboard Events handler */
-    if( kb_any_key_pressed() )
-    {
-        kb_process();
-    }
+    kb_process();
 }
 
 unsigned long get_time(void)
