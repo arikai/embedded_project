@@ -15,6 +15,9 @@
  *   print(', '.join('{:4}'.format(int(a0*2**(octave+n/12))) for n in range(0,11)), ',', sep='')
  */
 
+#define MIN_FREQ 55 // Lower values used for special cases
+		    // (rest, track end, etc.)
+
 XDATA(uint16_t) note_table[72] = {
       55,   58,   61,   65,   69,   73,   77,   82,   87,   92,   97,  103,
      110,  116,  123,  130,  138,  146,  155,  164,  174,  184,  195,  207,
@@ -45,7 +48,7 @@ void play_note(struct note * note)
 {
     uint16_t note_freq = note->freq;
 
-    if( note_freq != 0 )
+    if( note_freq >= MIN_FREQ )
     {
 	ET0 = 1;
 	set_note_period(note_freq);
@@ -53,3 +56,13 @@ void play_note(struct note * note)
     sleep(note->duration);
     ET0 = 0;
 }
+
+void play_track(struct note track[]){
+    uint16_t i;
+
+    for( i = 0; track[i].freq != NOTE_TRACK_END; ++i )
+    {
+	play_note(&(track[i]));
+    }
+}
+

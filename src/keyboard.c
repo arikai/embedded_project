@@ -17,6 +17,7 @@ void kb_init(void){
 struct kb_event internal_kb_event; 
 
 #define PRESS_THRESHOLD 20
+#define HOLD_THRESHOLD 100
 #define RELEASE_THRESHOLD 30
 
 void kb_process(void){
@@ -66,14 +67,18 @@ void kb_process(void){
 	key_pressed = ~kb_raw() & key_mask; // If watched key is pressed
 
 	if( key_pressed ){
-	    if( press_time < PRESS_THRESHOLD )
+	    release_time = 0;
+	    if( press_time < HOLD_THRESHOLD )
 	    {
 		++press_time;
 	    }
-	    else if( press_time == PRESS_THRESHOLD )
+	    if( press_time == PRESS_THRESHOLD )
 	    {
-		kb_push_event(key, KB_PRESS);
-		release_time = 0;
+		kb_push_event(key, KB_PRESS); // Pushed once
+	    }
+	    else if( press_time == HOLD_THRESHOLD )
+	    {
+		kb_push_event(key, KB_HOLD); // Pushed indefinetely if key is pressed
 	    }
 	}
 	else

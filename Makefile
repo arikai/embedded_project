@@ -56,7 +56,7 @@ clean:
 
 load: $(TARGET) load.m3p
 	@echo > $(COMPORT) || { echo -e "Permission denied to $(COMPORT).\n Consider running chmod o+rw $(COMPORT)" && false; }
-	$(M3P) lfile load.m3p & sleep 10 && pkill m3p &
+	$(M3P) lfile load.m3p & sleep 15 && pkill m3p &
 
 grant_tty_loop:
 	sudo sh -c 'while :; do sudo inotifywait -qe attrib $(COMPORT) && sudo chmod o+rw $(COMPORT); done 2>/dev/null & exit'

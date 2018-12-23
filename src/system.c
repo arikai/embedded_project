@@ -2,9 +2,11 @@
 #include "system.h"
 #include "timer.h"
 #include "interrupt.h"
+#include "keyboard.h"
+#include "display.h"
 
-#define MAXBASE 0x8 // Ќомер страницы внешней пам€ти (xdata), куда отображаютс€
-		    // регистры расширител€.
+#define MAXBASE 0x8 // Number of page of external memory (xdata)
+		    // where extensions registers are mapped to
 
 void write_max( XDATA(uint8_t *) regnum, uint8_t val )
 {
@@ -58,13 +60,19 @@ void or_ena(uint8_t or_value)
 
 // DO NOT CHANGE THE ORDER OF CALLS
 void init_system(){
-    
+
     // 0. Clear some registers (ENA,...)
     clear_registers();
 
     // 1. Interrupts must be configured properly
     init_interrupts();
-    
+
     // 2. Init timers.
     init_timers();
+
+    // 3. Init keyboard
+    kb_init();
+
+    // 4. Init LCD Display
+    dp_init();
 }

@@ -94,12 +94,17 @@ unsigned long get_time(void)
 
 unsigned long delta_time(unsigned long t0)
 {
-    return timer_ms - t0;
+    return get_time() - t0;
 }
 
 void sleep(unsigned long t)
 {
     unsigned long target = t + get_time();
+    sleep_till(target);
+}
+
+void sleep_till(unsigned long target)
+{
     while( get_time() <= target );
 }
 

@@ -7,12 +7,27 @@
 #define KEYNUM 16
 extern uint8_t keys[KEYNUM];
 
-enum kb_event_type { KB_NONE = 0, KB_PRESS, KB_RELEASE };
+enum kb_event_type { 
+    KB_NONE = 0, 
+    KB_PRESS = 1, 
+    KB_HOLD = 2, 
+    KB_RELEASE = 4,
+
+    // Masks
+    KB_IS_PRESSED = 3 // If key was either just pressed or is held
+};
 
 struct kb_event {
     uint8_t key;
-    enum kb_event_type type;
+    uint8_t type; // avoid enum def since I do not trust SDCC
 };
+
+#define KB_SWITCH(ev) switch( ((uint16_t)ev.key) << 8 | ev.type )
+#define KB_CASE(key, event) case (((uint16_t)key) << 8 | event )
+#define KB_CASE2(key, event1, event2)  case (((uint16_t)key) << 8 | event1 ): \
+				       /* FALLTHRU */                        \
+			               case (((uint16_t)key) << 8 | event2 )
+#define KB_IS(ev, mask) (ev.type & mask)
 
 #define kb_raw() (read_max(KB))
 #define kb_any_key_pressed() (kb_raw() ^ 0xf0) // VALID ONLY for zeroed 3-0 bits of KB

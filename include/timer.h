@@ -64,4 +64,8 @@ unsigned long delta_time(unsigned long t0);
  */
 void sleep(unsigned long t);
 
+/*
+ * Wait till time specified
+ */
+void sleep_till(unsigned long target);
 #endif /*  __TIMER_H__ */
