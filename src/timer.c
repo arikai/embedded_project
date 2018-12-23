@@ -59,7 +59,7 @@ void sound_int_handler(void) interrupt(TF0_VECTOR)
     TL0 = note_period[0];
     TH0 = note_period[1];
 
-    beep();
+    snd_int_handler();
 }
 
 /* Init System Timer (Timer 1) */

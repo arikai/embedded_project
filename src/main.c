@@ -12,37 +12,61 @@
 
 #include "demo.h"
 
-#define NOTEBN(o, n) NOTECN(o+1, n-1)
-struct note __xdata track[] = {
-    { NOTEBN(4, 0), NOTE_8TH },
-    { NOTE_REST   , NOTE_32TH },
-    { NOTEBN(4, 6), NOTE_8TH },
-    { NOTE_REST   , NOTE_32TH },
-    { NOTEBN(4, 4), NOTE_8TH },
-    { NOTE_REST   , NOTE_32TH },
-    { NOTEBN(4, 0), NOTE_8TH },
+XDATA(struct track) track = {
+    90,       // BPM
+    4, 4,     // Track signature
 
-    { NOTE_REST   , NOTE_16TH },
-    { NOTEBN(4, 3), NOTE_8TH },
+    TRACK_INF_REPEAT, // Repeat 1 times (play 2 times)
+    {
+	N(B4 + 0, 8)
+	N(B4 + 6, 8)
+	N(B4 + 4, 8)
+	N(B4 + 0, 8)
+	N(B4 + 3, 8d)
+	N(B4 + 3, 8d)
+	N(B4 + 4, 4)
 
-    { NOTE_REST   , NOTE_8TH },
-    { NOTEBN(4, 3), NOTE_8TH },
+	N(B4 + 0, 8)
+	N(B4 + 4, 8)
+	N(B4 + 0, 8)
+	N(B4 + 3, 8d)
+	N(B4 + 3, 8d)
+	N(B4 + 4, 8)
 
-    { NOTE_REST   , NOTE_8TH },
-    { NOTEBN(4, 4), NOTE_8TH },
+	N(B4 + 0, 8)
+	N(B4 + 6, 8)
+	N(B4 + 4, 8)
+	N(B4 + 0, 8)
+	N(B4 + 3, 8d)
+	N(B4 + 3, 8d)
+	N(B4 + 4, 4)
 
-    { NOTE_TRACK_END }
+	N(B4 + 0, 8)
+	N(B4 + 4, 8)
+	N(B4 + 8, 8)
+	N(B4 + 6, 8d)
+	N(B4 + 4, 8d)
+	N(B4 + 6, 8)
+
+	END
+    }
 };
 
 void main(void) {
     int8_t counter = 0;
     int i = 0;
 
+    struct note note;
+
+    note.pitch_idx = PITCHCN(4,0);
+    note.duration_64ths = NOTE_1;
+
     init_system();
-    play_track(track);
+
+    snd_set_bg_track(&track);
 
     /* Some demos from demo.c */
     // sound_test();     // Play all notes with ascending and descending pitch
     // piano_keyboard(); // Infinite loop for playing Cmaj on keyboard
-    // read_and_display_input(); // read and display keyboard's input
+    read_and_display_input("Hello, Frisk!"); // Show prompt and read and display keyboard's input
 }

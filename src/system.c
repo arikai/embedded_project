@@ -2,6 +2,7 @@
 #include "system.h"
 #include "timer.h"
 #include "interrupt.h"
+#include "sound.h"
 #include "keyboard.h"
 #include "display.h"
 
@@ -70,9 +71,12 @@ void init_system(){
     // 2. Init timers.
     init_timers();
 
-    // 3. Init keyboard
+    // 3. Init sound
+    snd_init();
+
+    // 4. Init keyboard
     kb_init();
 
-    // 4. Init LCD Display
+    // 5. Init LCD Display
     dp_init();
 }

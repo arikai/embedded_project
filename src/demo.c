@@ -26,7 +26,7 @@ void piano_keyboard(void)
 	KB_CASE2(key, KB_PRESS, KB_HOLD):                                   \
 	    note.freq = NOTECN(oct, (note_num));                            \
 	    leds((led));			                            \
-	    play_note(&note);			                            \
+	    snd_play_note(&note);			                            \
 	    cur_note = oct<<4 | note_num;                                   \
 	    if(last_note != cur_note) {                                     \
 		sprintf(buf, "Note: %s%d", note_names[note_num], oct);      \
@@ -72,23 +72,23 @@ void sound_test(void)
     for( i = 0; i < ALEN(note_table); ++i ){
 	note.freq = NOTE(i);
 	leds(i);
-	play_note(&note);
+	snd_play_note(&note);
     }
     for( i = ALEN(note_table)-1; i >= 0 ; --i ){
 	note.freq = NOTE(i);
 	leds(i);
-	play_note(&note);
+	snd_play_note(&note);
     }
 }
 */
 
-// /*
-void read_and_display_input(void)
+
+void read_and_display_input(const char* str) // read and display keyboard's input
 {
     dp_clear();
     dp_cursor_style(CURSOR_BLINK);
 
-    dp_print_string("Type anything:");
+    dp_print_string(str);
 
     dp_move_cursor(0, 1);
     while(1)
@@ -103,4 +103,3 @@ void read_and_display_input(void)
 	}
     }
 }
-// */

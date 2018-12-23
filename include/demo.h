@@ -18,6 +18,6 @@ void sound_test(void);
 /*
  * Read input from keyboard and display on LCD
  */
-void read_and_display_input(void);
+void read_and_display_input(const char* str); // read and display keyboard's input
 
 #endif /* __DEMO_H__ */
