@@ -1,6 +1,7 @@
 #include "aduc812.h"
 #include "sound.h"
 #include "system.h"
+#include "time.h"
 #include "timer.h"
 
 #include <stdint.h>

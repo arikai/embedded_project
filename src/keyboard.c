@@ -1,5 +1,6 @@
 #include "keyboard.h"
 #include "system.h"
+#include "time.h"
 
 #include "led.h"
 
@@ -17,7 +18,8 @@ void kb_init(void){
 struct kb_event internal_kb_event; 
 
 #define PRESS_THRESHOLD 20
-#define HOLD_THRESHOLD 100
+#define HOLD_THRESHOLD 255
+#define HOLD_STEP      200
 #define RELEASE_THRESHOLD 30
 
 void kb_process(void){
@@ -26,8 +28,9 @@ void kb_process(void){
     static uint8_t key_mask; // Mask to check if watched key is pressed
     static uint8_t key;      // Key Pressed (ASCII char)
 
-    static uint8_t press_time;
-    static uint8_t release_time;
+    static uint8_t press_time   = 0;
+    static uint8_t hold_time    = 0;
+    static uint8_t release_time = 0;
 
     uint8_t col_num;
 
@@ -56,7 +59,6 @@ void kb_process(void){
 			case 0x80: key = keys[12 + col_num]; break;
 		    }
 		    press_time = 1;
-		    release_time = 0;
 		    kb_set_mask(col_mask); // Read only specific column now
 		    return;
 		}
@@ -78,7 +80,11 @@ void kb_process(void){
 	    }
 	    else if( press_time == HOLD_THRESHOLD )
 	    {
-		kb_push_event(key, KB_HOLD); // Pushed indefinetely if key is pressed
+		++hold_time;
+		if(hold_time == HOLD_STEP){
+		    kb_push_event(key, KB_HOLD); // Pushed indefinitely
+		    hold_time = 0;
+		}
 	    }
 	}
 	else
@@ -91,6 +97,7 @@ void kb_process(void){
 	    {
 		kb_push_event(key, KB_RELEASE);
 		press_time = 0;
+		hold_time = 0;
 		release_time = 0;
 		col_mask = 0;
 		// key_mask = 0; // Ideally must be cleared
@@ -112,6 +119,8 @@ void kb_push_event( uint8_t key, enum kb_event_type type )
 
 enum kb_event_type kb_poll_event(void)
 {
+    while( internal_kb_event.type == KB_NONE );
+
     kb_event.key  = internal_kb_event.key;
     kb_event.type = internal_kb_event.type;
     internal_kb_event.type = KB_NONE;

@@ -50,7 +50,7 @@ extern struct kb_event kb_event;
 void kb_push_event(uint8_t key, enum kb_event_type);
 
 /*
- * Fill kb_event with first event in Event Queue
+ * Return last keyboard event. If event didn't occur, wait until it occurs.
  * Return it's type
  * NOTE: YOU guess why it doesn't return struct.
  */

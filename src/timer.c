@@ -1,4 +1,6 @@
-#include "timer.h"
+#include "timer.h" // Internals
+#include "time.h"  // API
+
 #include "sound.h" // Sound Timer (Timer 0) 
 #include "aduc812.h"
 #include "interrupt.h"

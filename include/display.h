@@ -42,6 +42,11 @@ void dp_cursor_style(enum cursor_style);
  */
 void dp_move_cursor(uint8_t x, bit y);
 
+/*
+ * Shift cursor for 1 character right (1) or left (0)
+ */
+void dp_shift_cursor(bit right);
+
 #define DP_MAX_X 15
 #define DP_MAX_Y 1
 

@@ -20,4 +20,9 @@ void sound_test(void);
  */
 void read_and_display_input(const char* str); // read and display keyboard's input
 
+/*
+ * Login prompt
+ */
+void login(void);
+
 #endif /* __DEMO_H__ */

@@ -1,6 +1,7 @@
 #include "display.h"
 #include "system.h"
 #include "timer.h"
+#include "time.h"
 
 /*
  * Registers and constants for Read/Write
@@ -63,6 +64,7 @@
 #define DP_OPT_CURSOR          0x00    // Shift not cursor but display contents 
 
 #define DP_OPT_RIGHT           0x04    // Shift direction
+#define DP_OPT_LEFT            0x00
 
 
 /* Set Display Functioning controls */ 
@@ -214,14 +216,39 @@ void dp_move_cursor(uint8_t nx, bit ny)
     y = ny;
 }
 
+void dp_shift_cursor(bit right)
+{
+    if( right && x == DP_MAX_X )
+    {
+	x = 0;
+	y = !y;
+    }
+    else if( !right && x == 0 )
+    {
+	x = DP_MAX_X;
+	y = !y;
+    }
+    else 
+    {
+	x += right ? 1 : -1;  
+    }
+
+    dp_command(DP_CMD_RAM_DD | x+(y ? 40 : 0));
+//    dp_command( DP_CMD_SHIFT
+//	        | DP_OPT_CURSOR
+//	        | ( right ? DP_OPT_RIGHT : DP_OPT_LEFT ) );
+}
+
 void dp_init(void)
 {
      dp_command( DP_CMD_FUNCTION_SET 
- 	        | DP_OPT_EIGHT_BITS
- 		| DP_OPT_TWO_LINE
- 		| DP_OPT_SIZE_5x11
- 		);
+ 	         | DP_OPT_EIGHT_BITS
+ 		 | DP_OPT_TWO_LINE
+ 		 | DP_OPT_SIZE_5x11);
 
+     dp_command( DP_CMD_ENTRY_MODE
+		 | DP_OPT_CURSOR_INC
+		 | DP_OPT_SETSH_CURSOR);
     dp_clear();
 
     return;
