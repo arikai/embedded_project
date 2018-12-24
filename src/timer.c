@@ -22,7 +22,7 @@
 #define TIMER_DELAY_HIGH ((unsigned char)(0xff - TIMER_MS_TICK_HIGH))
 #define TIMER_DELAY_LOW  ((unsigned char)(0xff - TIMER_MS_TICK_LOW))
 
-static unsigned long timer_ms;
+static time_t timer_ms;
 
 void init_sound_timer(void);
 void sound_int_handler(void) interrupt(TF0_VECTOR);
@@ -88,24 +88,24 @@ void system_timer_int_handler(void) interrupt(TF1_VECTOR)
     kb_process();
 }
 
-unsigned long get_time(void)
+time_t get_time(void)
 {
-    unsigned long local = timer_ms; // Avoid possible interruption
+    time_t local = timer_ms; // Avoid possible interruption
     return local;
 }
 
-unsigned long delta_time(unsigned long t0)
+time_t delta_time(time_t t0)
 {
     return get_time() - t0;
 }
 
-void sleep(unsigned long t)
+void sleep(time_t t)
 {
-    unsigned long target = t + get_time();
+    time_t target = t + get_time();
     sleep_till(target);
 }
 
-void sleep_till(unsigned long target)
+void sleep_till(time_t target)
 {
     while( get_time() <= target );
 }

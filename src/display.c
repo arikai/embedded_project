@@ -110,11 +110,13 @@ Other commands:
 // Only CLEAR/HOME commands have significant execution times (~2ms)
 // While other commands have exec times < 1ms (37us)
 // Just make those commands sleep for 2 ms instead
-// #define dp_wait() while( 0x80 & dp_read(DP_DATA) ) 
+// #define dp_wait() while( 0x80 & dp_read(DP_COMMAND) ) 
 
-// Macros for commands
+// Frequently used commands
 #define dp_command(data) dp_write(data, DP_COMMAND)
 #define dp_write_data(data) dp_write(data, DP_DATA)
+#define dp_read_data(data)  dp_read(DP_DATA)
+#define dp_set_address(address) dp_command(DP_CMD_RAM_DD | address)
 
 
 void dp_write(uint8_t data, uint8_t mode)
@@ -162,6 +164,17 @@ void dp_clear(void)
     sleep(2);
 }
 
+void dp_clear_line(void)
+{
+    uint8_t i;
+    dp_move_cursor(0,y);
+    for( i = 0; i < DP_MAX_X; ++i)
+    {
+	dp_write_data(' ');
+    }
+    dp_move_cursor(0, y);
+}
+
 void dp_home(void)
 {
     dp_command( DP_CMD_HOME );
@@ -169,20 +182,22 @@ void dp_home(void)
     sleep(2);
 }
 
+void dp_line_home(void)
+{
+    dp_move_cursor(0, y);
+}
+
 void dp_print_char(char c)
 {
-    dp_write_data(c);
-
-    if( x >= DP_MAX_X )
+    if( x > DP_MAX_X )
     {
-	x = 0;
-	y = !y; // Only lines 0 and 1
-	dp_move_cursor(x, y);
+	dp_newline();
     }
     else
     {
 	++x;
     }
+    dp_write_data(c);
 }
 
 void dp_print_string(char str[])
@@ -209,9 +224,10 @@ void dp_cursor_style(enum cursor_style style)
 	    );
 }
 
+#define POS_ADDRESS(x, y) (x + ( y ? 40 : 0) )
 void dp_move_cursor(uint8_t nx, bit ny)
 {
-    dp_command(DP_CMD_RAM_DD | nx+(ny ? 40 : 0));
+    dp_set_address(POS_ADDRESS(nx, ny));
     x = nx;
     y = ny;
 }
@@ -233,24 +249,60 @@ void dp_shift_cursor(bit right)
 	x += right ? 1 : -1;  
     }
 
-    dp_command(DP_CMD_RAM_DD | x+(y ? 40 : 0));
-//    dp_command( DP_CMD_SHIFT
-//	        | DP_OPT_CURSOR
-//	        | ( right ? DP_OPT_RIGHT : DP_OPT_LEFT ) );
+    dp_set_address(POS_ADDRESS(x,y));
+
+    // Doesn't work properly for some reason
+    //    dp_command( DP_CMD_SHIFT
+    //	        | DP_OPT_CURSOR
+    //	        | ( right ? DP_OPT_RIGHT : DP_OPT_LEFT ) );
+}
+
+void dp_newline(void)
+{
+    uint8_t buf[DP_MAX_X+1];
+    uint8_t i;
+
+    if( y != DP_MAX_Y )
+    {
+	dp_move_cursor(0, !y);
+	return;
+    }
+
+    for( i = 0; i <= DP_MAX_X; ++i)
+    {
+	// Do not use ~dp_move_cursor~ to save a few cycles
+
+	dp_set_address(POS_ADDRESS(i, 1)); 
+	buf[i] = dp_read_data();
+    }
+
+    dp_move_cursor(0, 1);
+    for( i = 0; i <= DP_MAX_X; ++i )
+    {
+	dp_write_data(' ');
+    }
+
+    dp_move_cursor(0, 0);
+    for( i = 0; i <= DP_MAX_X; ++i )
+    {
+	dp_write_data(buf[i]);
+    }
+
+    dp_move_cursor(0, 1);
 }
 
 void dp_init(void)
 {
-     dp_command( DP_CMD_FUNCTION_SET 
- 	         | DP_OPT_EIGHT_BITS
- 		 | DP_OPT_TWO_LINE
- 		 | DP_OPT_SIZE_5x11);
+    dp_command( DP_CMD_FUNCTION_SET 
+   	        | DP_OPT_EIGHT_BITS
+   	        | DP_OPT_TWO_LINE
+   	        | DP_OPT_SIZE_5x11);
 
-     dp_command( DP_CMD_ENTRY_MODE
-		 | DP_OPT_CURSOR_INC
-		 | DP_OPT_SETSH_CURSOR);
+    dp_command( DP_CMD_ENTRY_MODE
+	        | DP_OPT_CURSOR_INC
+	        | DP_OPT_SETSH_CURSOR);
+
     dp_clear();
-
     return;
 }
 

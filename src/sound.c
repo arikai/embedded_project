@@ -184,48 +184,72 @@ void snd_int_handler(void)
     }
 }
 
-void snd_play_note(struct note * note)
-{
-    uint16_t note_freq; 
-    int8_t pitch_idx;
-    unsigned long note_duration  = 0;
-    unsigned long pause_duration = 0;
-    unsigned long current_time;
-
-    pitch_idx = note->pitch_idx;
-    note_duration = DURATION(note);
-
-    if( pitch_idx == NOTE_REST )
-    {
-	sleep(note_duration);
-	return;
-    }
-
-    if( pitch_idx >= 0 )
-    {
-	note_freq = pitch_table[pitch_idx];
-	ET0 = 1;
-	snd_set_note_period(note_freq);
-	current_time = get_time();
-    }
-
-    switch( note->articulation ){
-	case ART_LEGATO: break;
-	case ART_NONE:     
-	    pause_duration = (note_duration >> 2); 
-	    note_duration  = (note_duration >> 2) + (note_duration >> 1); 
-	    break;
-	case ART_STACCATO: 
-	    pause_duration = (note_duration >> 1);
-	    note_duration  = (note_duration >> 1);
-	    break;
-    }
-
-    sleep_till(current_time + note_duration);
-    if( !bg_track )
-	ET0 = 0;
-    sleep_till(current_time + pause_duration);
-}
+// void snd_play_note(struct note * note)
+// {
+//     uint16_t note_freq; 
+//     int8_t pitch_idx;
+//     unsigned long note_duration  = 0;
+//     unsigned long pause_duration = 0;
+//     unsigned long current_time;
+// 
+//     pitch_idx = note->pitch_idx;
+//     note_duration = DURATION(note);
+// 
+//     if( pitch_idx == NOTE_REST )
+//     {
+// 	sleep(note_duration);
+// 	return;
+//     }
+// 
+//     if( pitch_idx >= 0 )
+//     {
+// 	note_freq = pitch_table[pitch_idx];
+// 	ET0 = 1;
+// 	snd_set_note_period(note_freq);
+// 	current_time = get_time();
+//     }
+// 
+//     switch( note->articulation ){
+// 	case ART_LEGATO: break;
+// 	case ART_NONE:     
+// 	    pause_duration = (note_duration >> 2); 
+// 	    note_duration  = (note_duration >> 2) + (note_duration >> 1); 
+// 	    break;
+// 	case ART_STACCATO: 
+// 	    pause_duration = (note_duration >> 1);
+// 	    note_duration  = (note_duration >> 1);
+// 	    break;
+//     }
+// 
+//     sleep_till(current_time + note_duration);
+//     if( !bg_track )
+// 	ET0 = 0;
+//     sleep_till(current_time + pause_duration);
+// }
+// 
+// void snd_play_track(struct track* track){
+//     uint16_t i = 0;
+//     struct note* note = &(track->notes[0]);
+//     int8_t repeat;
+// 
+//     snd_set_bpm(track->bpm);
+//     snd_set_time_signature(track->signature_upper, track->signature_lower);
+//     repeat = track->repeat;
+// 
+// #define PLAY_TRACK() while((note+i)->pitch_idx != NOTE_TRACK_END) snd_play_note(note+(i++))
+//     if( repeat == TRACK_INF_REPEAT ){
+// 	while(1){
+// 	    PLAY_TRACK();
+// 	    i = 0;
+// 	}
+//     }
+//     else do
+//     {
+// 	PLAY_TRACK();
+// 	i = 0;
+// 	--repeat;
+//     } while (repeat >= 0);
+// }
 
 void snd_set_bg_track(struct track* track)
 {
@@ -242,29 +266,6 @@ void snd_set_bg_track(struct track* track)
     ET0 = 1;
 }
 
-void snd_play_track(struct track* track){
-    uint16_t i = 0;
-    struct note* note = &(track->notes[0]);
-    int8_t repeat;
-
-    snd_set_bpm(track->bpm);
-    snd_set_time_signature(track->signature_upper, track->signature_lower);
-    repeat = track->repeat;
-
-#define PLAY_TRACK() while((note+i)->pitch_idx != NOTE_TRACK_END) snd_play_note(note+(i++))
-    if( repeat == TRACK_INF_REPEAT ){
-	while(1){
-	    PLAY_TRACK();
-	    i = 0;
-	}
-    }
-    else do
-    {
-	PLAY_TRACK();
-	i = 0;
-	--repeat;
-    } while (repeat >= 0);
-}
 
 void snd_init(void)
 {

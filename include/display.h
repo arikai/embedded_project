@@ -11,6 +11,14 @@ enum cursor_style {
 };
 
 /*
+ * SOME special characters for HD44780
+ */
+
+#define CHAR_ARROW_UP    0x18
+#define CHAR_ARROW_DOWN  0x19
+#define CHAR_TRIANG_UP   0x1e
+#define CHAR_TRIANG_DOWN 0x1f
+/*
  * Initialize LCD
  */
 void dp_init(void);
@@ -21,9 +29,19 @@ void dp_init(void);
 void dp_clear(void);
 
 /*
- * Return cursor to home position
+ * Clear current line
+ */
+void dp_clear_line(void);
+
+/*
+ * Return cursor to global home position
  */
 void dp_home(void);
+
+/*
+ * Return cursor to line's home position
+ */
+void dp_line_home(void);
 
 /*
  * Enable/disable LCD display
@@ -46,6 +64,11 @@ void dp_move_cursor(uint8_t x, bit y);
  * Shift cursor for 1 character right (1) or left (0)
  */
 void dp_shift_cursor(bit right);
+
+/*
+ * Shift display up
+ */
+void dp_newline(void);
 
 #define DP_MAX_X 15
 #define DP_MAX_Y 1

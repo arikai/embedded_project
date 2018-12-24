@@ -1,7 +1,7 @@
 #include "tracks.h"
 #include "sound.h"
 
-// XDATA(struct track) ut_theme_track = {
+// TRACK( ut_theme_track ) = {
 //     90,       // BPM
 //     4, 4,     // Track signature
 // 
@@ -41,3 +41,34 @@
 //     }
 // };
 
+#define K2 (G4+1-24)
+#define K3 (G4+1-12)
+TRACK( intro_track ) = {
+    60,
+    4, 4,
+    TRACK_NO_REPEAT,
+    {
+	S( K2, 1 )
+	S( K2, 1 )
+	S( K2, 1 )
+	S( K2, 1 )
+	S( K2, 1 )
+	S( K2, 1 )
+	S( K2, 1 )
+	S( K2, 1 )
+
+	R( 1 )
+	R( 1 )
+	
+	L( K3+0, 4 )
+	L( K3+1, 4 )
+	L( K3+2, 4 )
+	L( K3+3, 4 )
+	L( K3+4, 4 )
+	L( K3+5, 4 )
+	L( K3+6, 4 )
+	L( K3+7, 4 )
+
+	END
+    }
+};

@@ -7,6 +7,9 @@ CFLAGS  := $(CFLAGS) --opt-code-size # Optimization flags
 # Maybe useful flags
 CFLAGS := $(CFLAGS) --no-xinit-opt    --no-c-code-in-asm --no-peep-comments 
 
+# SDK model-dependent flags
+CFLAGS := $(CFLAGS) -DBROKEN_KEYBOARD
+
 LFLAGS  = --code-loc 0x2100 --xram-loc 0x6000 --stack-auto --stack-loc 0x80 
 
 # Настройки M3P
@@ -23,6 +26,9 @@ NAME = prog
 TARGET = $(NAME).bin
 SRCDIR = src
 
+KEYBINDINGS     = ./include/bindings.h
+KEYBINDINGS_GEN = ./gen_bindings.py
+
 SRCS = $(wildcard ./$(SRCDIR)/*.c)
 
 LIST_OBJ = $(SRCS:.c=.rel)
@@ -31,9 +37,12 @@ all: build load
 
 build: $(TARGET)
 
-$(TARGET) : $(LIST_OBJ) Makefile
+$(TARGET) : $(KEYBINDINGS) $(LIST_OBJ) Makefile
 	$(CC) $(LIST_OBJ) -o $(NAME).hex $(LFLAGS)
 	$(M3P) hb166 $(NAME).hex $(TARGET) bye
+
+$(KEYBINDINGS): $(KEYBINDINGS_GEN)
+	$(KEYBINDINGS_GEN) $@
 
 $(LIST_OBJ) : %.rel : %.c
 	$(CC) -c $(CFLAGS) $< -o $@  
@@ -56,7 +65,7 @@ clean:
 
 load: $(TARGET) load.m3p
 	@echo > $(COMPORT) || { echo -e "Permission denied to $(COMPORT).\n Consider running chmod o+rw $(COMPORT)" && false; }
-	$(M3P) lfile load.m3p & sleep 15 && pkill m3p &
+	$(M3P) lfile load.m3p & sleep 30 && pkill m3p &
 
 grant_tty_loop:
 	sudo sh -c 'while :; do sudo inotifywait -qe attrib $(COMPORT) && sudo chmod o+rw $(COMPORT); done 2>/dev/null & exit'

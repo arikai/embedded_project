@@ -106,6 +106,7 @@ void read_and_display_input(const char* str) // read and display keyboard's inpu
 }
 */
 
+/*
 void login(void)
 {
     char buf_login[40];
@@ -135,3 +136,4 @@ void login(void)
 	sleep(2000);
     }
 }
+*/

@@ -1,6 +1,7 @@
 #include "keyboard.h"
 #include "system.h"
 #include "time.h"
+#include "random_feed.h"
 
 #include "led.h"
 
@@ -120,6 +121,12 @@ void kb_push_event( uint8_t key, enum kb_event_type type )
 enum kb_event_type kb_poll_event(void)
 {
     while( internal_kb_event.type == KB_NONE );
+
+    // Feed value to (P)RNG
+    random_feed(
+	    internal_kb_event.key 
+	    ^ (internal_kb_event.type << 4) 
+	    ^ ((uint8_t) get_time()) );
 
     kb_event.key  = internal_kb_event.key;
     kb_event.type = internal_kb_event.type;
